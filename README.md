@@ -7,6 +7,7 @@ Joguinhos que fiz para estudar SDL2 e aplicar meus conhecimentos em C.
 - Quebra Blocos: você usa uma bolinha para destruir blocos de tijolos;
   - OBS: Créditos das imagens estão no README presente no arquivo Quebra_Bloco.
 - Tetramino: jogo arcade para encaixar blocos e fazer a maior pontuação possível.
+  - OBS: Estou fazendo ele.
 
 ## Como usar:
 
