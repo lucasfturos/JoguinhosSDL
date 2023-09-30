@@ -5,11 +5,15 @@
 #include <SDL2/SDL_ttf.h>
 #include <math.h>
 #include <stdio.h>
+#include <time.h>
 
 // Macros
-#define WIDTH 720
+#define WIDTH 1080
 #define HEIGHT 720
+#define BOARD_W 1000
+#define BOARD_H 600
 #define FPS 60
+#define SPEED_SNAKE 8
 #define SIZE_SNAKE 30
 #define SIZE_TAIL 100
 
@@ -24,12 +28,6 @@ typedef struct {
     TTF_Font *font;
 } Resources;
 
-// Variables
-static int score, defeat;
-
-static Resources resMgr;
-static Point snake, apple;
-static Point tail[SIZE_TAIL];
 
 // Functions
 int init();
@@ -37,5 +35,6 @@ void setup();
 void update();
 void destroyResources();
 void render(SDL_Renderer *ren);
+SDL_Rect createRect(int x, int y, int w, int h);
 
 #endif // !COBRINHA_H
