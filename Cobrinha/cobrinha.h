@@ -28,13 +28,11 @@ typedef struct {
     TTF_Font *font;
 } Resources;
 
-
 // Functions
 int init();
 void setup();
 void update();
 void destroyResources();
 void render(SDL_Renderer *ren);
-SDL_Rect createRect(int x, int y, int w, int h);
 
 #endif // !COBRINHA_H
