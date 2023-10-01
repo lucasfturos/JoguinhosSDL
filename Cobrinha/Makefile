@@ -1,4 +1,5 @@
 run: build
+	@clear
 	@./cobra
 build:
 	@gcc -Wall -Wextra -g -o cobra \

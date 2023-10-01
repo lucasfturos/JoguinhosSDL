@@ -1,23 +1,13 @@
 #include "obj.h"
 
+int tailSize = 0;
 int score, defeat, level;
+int boardx = (WIDTH - BOARD_W) / 2;
+int boardy = (HEIGHT - BOARD_H) / 2;
+
 Resources resMgr;
 Point snake, apple;
-Point tail[SIZE_TAIL];
-
-void setup() {
-    srand(time(0));
-    int boardx = (WIDTH - BOARD_W) / 2;
-    int boardy = (HEIGHT - BOARD_H) / 2;
-
-    score = 0;
-    level = 1;
-    snake.x = (int)BOARD_W / 2;
-    snake.y = (int)BOARD_H / 2;
-    defeat = 0;
-    apple.x = rand() % (BOARD_W + 1 - boardx) + boardx;
-    apple.y = rand() % (BOARD_H + 1 - boardy) + boardy;
-}
+Point tail[MAX_SIZE_TAIL];
 
 int init() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -51,7 +41,7 @@ int init() {
     }
     resMgr.font = TTF_OpenFont("font/times.ttf", 30);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 void destroyResources() {
@@ -60,41 +50,68 @@ void destroyResources() {
     SDL_DestroyWindow(resMgr.win);
 }
 
+void setup() {
+    srand(time(0));
+
+    score = 0;
+    level = 1;
+    snake.x = (int)BOARD_W / 2;
+    snake.y = (int)BOARD_H / 2;
+    defeat = 0;
+    apple.x = rand() % (BOARD_W + 1 - boardx) + boardx;
+    apple.y = rand() % (BOARD_H + 1 - boardy) + boardy;
+}
+
 void update() {
-    int boardx = (WIDTH - BOARD_W) / 2;
-    int boardy = (HEIGHT - BOARD_H) / 2;
+    for (int i = tailSize - 1; i > 0; i--) {
+        tail[i] = tail[i - 1];
+    }
+
+    if (tailSize > 0) {
+        tail[0] = snake;
+    }
 
     if (snake.x < ((WIDTH - BOARD_W) / 2) + 10) {
         snake.x = ((WIDTH - BOARD_W) / 2) + 10;
     }
+
     if (snake.y < ((HEIGHT - BOARD_H) / 2) + 10) {
         snake.y = ((HEIGHT - BOARD_H) / 2) + 10;
     }
+
     if (snake.x >= BOARD_W) {
         snake.x = BOARD_W;
     }
+
     if (snake.y >= BOARD_H + 20) {
         snake.y = BOARD_H + 20;
     }
+
     if (snake.x + SIZE_SNAKE >= apple.x - 10 && snake.x <= apple.x + 30 &&
         snake.y + SIZE_SNAKE >= apple.y - 10 && snake.y <= apple.y + 30) {
-        score += 10;
+        score += 5;
         if (score % 20 == 0) {
             level++;
         }
+
         apple.x = rand() % (BOARD_W - boardx) + boardx;
         apple.y = rand() % (BOARD_H - boardy) + boardy;
+
+        if (tailSize < MAX_SIZE_TAIL) {
+            tailSize++;
+            tail[tailSize - 1] = snake;
+        }
     }
 }
 
 void render(SDL_Renderer *ren) {
-    int borderThicness = 5;
-    int boardx = (WIDTH - BOARD_W) / 2;
-    int boardy = (HEIGHT - BOARD_H) / 2;
-    drawBoard(ren, boardx, boardy, borderThicness);
+    drawBoard(ren, boardx, boardy, 5);
     drawText(ren, resMgr.font, boardx, score, level);
     drawApple(ren, apple.x, apple.y);
     drawSnake(ren, snake.x, snake.y);
+    for (int k = 0; k < tailSize; k++) {
+        drawSnake(ren, tail[k].x, tail[k].y);
+    }
 }
 
 int main(void) {
@@ -151,5 +168,5 @@ int main(void) {
     }
     destroyResources();
     SDL_Quit();
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }

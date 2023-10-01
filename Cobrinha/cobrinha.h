@@ -5,6 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 // Macros
@@ -15,7 +16,8 @@
 #define FPS 60
 #define SPEED_SNAKE 8
 #define SIZE_SNAKE 30
-#define SIZE_TAIL 100
+#define SIZE_APPLE 20
+#define MAX_SIZE_TAIL 100
 
 // Structs
 typedef struct {
@@ -34,5 +36,6 @@ void setup();
 void update();
 void destroyResources();
 void render(SDL_Renderer *ren);
+void addTailSegment(int x, int y);
 
 #endif // !COBRINHA_H

@@ -12,7 +12,7 @@ SDL_Rect createRect(int x, int y, int w, int h) {
 
 void drawApple(SDL_Renderer *ren, int x, int y) {
     SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
-    SDL_Rect appleRect = createRect(x, y, 20, 20);
+    SDL_Rect appleRect = createRect(x, y, SIZE_APPLE, SIZE_APPLE);
     SDL_RenderFillRect(ren, &appleRect);
 }
 
@@ -24,16 +24,22 @@ void drawSnake(SDL_Renderer *ren, int x, int y) {
 
 void drawText(SDL_Renderer *ren, TTF_Font *font, int boardx, int score,
               int level) {
-    // Score
     SDL_Color textColor = {255, 255, 255, 255};
+
+    // Score
     char scoreText[50];
     snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
     SDL_Surface *scoreSurface =
         TTF_RenderText_Solid(font, scoreText, textColor);
     SDL_Texture *scoreTexture = SDL_CreateTextureFromSurface(ren, scoreSurface);
     SDL_Rect scoreRect = {
-        .x = boardx, .y = 10, .w = scoreSurface->w, .h = scoreSurface->h};
+        .x = boardx,
+        .y = 10,
+        .w = scoreSurface->w,
+        .h = scoreSurface->h,
+    };
     SDL_RenderCopy(ren, scoreTexture, NULL, &scoreRect);
+
     // Level
     char levelText[50];
     snprintf(levelText, sizeof(scoreText), "Level: %d", level);
@@ -42,11 +48,18 @@ void drawText(SDL_Renderer *ren, TTF_Font *font, int boardx, int score,
     SDL_Texture *levelTexture = SDL_CreateTextureFromSurface(ren, levelSurface);
     int levelTextWidth, levelTextHeight;
     TTF_SizeText(font, levelText, &levelTextWidth, &levelTextHeight);
-    SDL_Rect levelRect = {.x = BOARD_W - levelTextWidth + 40,
-                          .y = 10,
-                          .w = levelTextWidth,
-                          .h = levelTextHeight};
+    SDL_Rect levelRect = {
+        .x = BOARD_W - levelTextWidth + 40,
+        .y = 10,
+        .w = levelTextWidth,
+        .h = levelTextHeight,
+    };
     SDL_RenderCopy(ren, levelTexture, NULL, &levelRect);
+
+    SDL_FreeSurface(scoreSurface);
+    SDL_FreeSurface(levelSurface);
+    SDL_DestroyTexture(scoreTexture);
+    SDL_DestroyTexture(levelTexture);
 }
 
 void drawBoard(SDL_Renderer *ren, int boardx, int boardy, int borderThicness) {
