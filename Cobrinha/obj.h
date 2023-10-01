@@ -3,7 +3,7 @@
 
 #include "cobrinha.h"
 
-void drawText(SDL_Renderer *ren, TTF_Font *font, int boardx, int score, int level);
+void drawText(SDL_Renderer *ren, TTF_Font *font, int x, int y, char *text);
 SDL_Rect createRect(int x, int y, int w, int h);
 void drawSnake(SDL_Renderer *ren, int x, int y);
 void drawApple(SDL_Renderer *ren, int x, int y);

@@ -14,7 +14,7 @@
 #define BOARD_W 1000
 #define BOARD_H 600
 #define FPS 60
-#define SPEED_SNAKE 8
+#define SPEED_SNAKE 10
 #define SIZE_SNAKE 30
 #define SIZE_APPLE 20
 #define MAX_SIZE_TAIL 100
@@ -30,11 +30,40 @@ typedef struct {
     TTF_Font *font;
 } Resources;
 
+// Enum
+enum SnakeDir {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+};
+
+enum GameState {
+    PLAYING,
+    PAUSED,
+    DEFEAT,
+};
+
+// Variables global
+static int tailSize;
+static int elapsedTime;
+static int score, level;
+static int minutes, seconds;
+static int boardx = (WIDTH - BOARD_W) / 2;
+static int boardy = (HEIGHT - BOARD_H) / 2;
+
+// Struct global
+static Resources resMgr;
+static Point snake, apple;
+static Point tail[MAX_SIZE_TAIL];
+
+// Enum global
+static enum SnakeDir currentDir = LEFT;
+static enum GameState gameState = PLAYING;
+
 // Functions
-int init();
 void setup();
 void update();
-void destroyResources();
 void render(SDL_Renderer *ren);
 void addTailSegment(int x, int y);
 

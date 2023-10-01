@@ -22,44 +22,19 @@ void drawSnake(SDL_Renderer *ren, int x, int y) {
     SDL_RenderFillRect(ren, &snakeRect);
 }
 
-void drawText(SDL_Renderer *ren, TTF_Font *font, int boardx, int score,
-              int level) {
+void drawText(SDL_Renderer *ren, TTF_Font *font, int x, int y, char *text) {
     SDL_Color textColor = {255, 255, 255, 255};
-
-    // Score
-    char scoreText[50];
-    snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
-    SDL_Surface *scoreSurface =
-        TTF_RenderText_Solid(font, scoreText, textColor);
-    SDL_Texture *scoreTexture = SDL_CreateTextureFromSurface(ren, scoreSurface);
-    SDL_Rect scoreRect = {
-        .x = boardx,
-        .y = 10,
-        .w = scoreSurface->w,
-        .h = scoreSurface->h,
+    SDL_Surface *textSurface = TTF_RenderText_Solid(font, text, textColor);
+    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(ren, textSurface);
+    SDL_Rect textRect = {
+        .x = x,
+        .y = y,
+        .w = textSurface->w,
+        .h = textSurface->h,
     };
-    SDL_RenderCopy(ren, scoreTexture, NULL, &scoreRect);
-
-    // Level
-    char levelText[50];
-    snprintf(levelText, sizeof(scoreText), "Level: %d", level);
-    SDL_Surface *levelSurface =
-        TTF_RenderText_Solid(font, levelText, textColor);
-    SDL_Texture *levelTexture = SDL_CreateTextureFromSurface(ren, levelSurface);
-    int levelTextWidth, levelTextHeight;
-    TTF_SizeText(font, levelText, &levelTextWidth, &levelTextHeight);
-    SDL_Rect levelRect = {
-        .x = BOARD_W - levelTextWidth + 40,
-        .y = 10,
-        .w = levelTextWidth,
-        .h = levelTextHeight,
-    };
-    SDL_RenderCopy(ren, levelTexture, NULL, &levelRect);
-
-    SDL_FreeSurface(scoreSurface);
-    SDL_FreeSurface(levelSurface);
-    SDL_DestroyTexture(scoreTexture);
-    SDL_DestroyTexture(levelTexture);
+    SDL_RenderCopy(ren, textTexture, NULL, &textRect);
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
 }
 
 void drawBoard(SDL_Renderer *ren, int boardx, int boardy, int borderThicness) {
