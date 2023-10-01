@@ -3,7 +3,6 @@
 Joguinhos que fiz para estudar SDL2 e aplicar meus conhecimentos em C.
 
 - Cobrinha ou SnakeGame: jogo onde uma cobra come uma fruta e cresce de tamanho. Ganha se você ocupa toda a tela com o tamanho da calda da cobra;
-  - OBS: Estou começando ele.
 - Quebra Blocos: você usa uma bolinha para destruir blocos de tijolos;
   - OBS: Créditos das imagens estão no README presente no arquivo Quebra_Bloco.
 - Tetramino: jogo arcade para encaixar blocos e fazer a maior pontuação possível.
