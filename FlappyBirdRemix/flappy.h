@@ -1,0 +1,39 @@
+#ifndef FLAPPY_H
+#define FLAPPY_H
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+// Macros
+#define WIDTH 1080
+#define HEIGHT 640
+#define FPS 60
+
+#define BIRD_WIDTH 34
+#define BIRD_HEIGHT 24
+#define NUM_FRAMES 3
+#define PIPE_WIDTH 52
+#define PIPE_HEIGHT 320
+#define PIPE_SPEED 5
+
+// Structs
+typedef struct {
+    SDL_Window *win;
+    SDL_Renderer *ren;
+    TTF_Font *font;
+    SDL_Texture *bgTex;
+    SDL_Texture *pipeTex;
+    SDL_Texture *birdTex;
+} Resources;
+
+// Enum
+enum GameState {
+    PLAYING,
+    PAUSED,
+    DEFEAT,
+};
+
+#endif// !FLAPPY_H
