@@ -6,6 +6,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 // Macros
 #define WIDTH 1080
@@ -18,8 +19,16 @@
 #define PIPE_WIDTH 52
 #define PIPE_HEIGHT 320
 #define PIPE_SPEED 5
+#define MAX_PIPES 5
 
 // Structs
+typedef struct Pipe {
+    int x;
+    int topY;
+    int bottomY;
+    struct Pipe *next;
+} Pipe;
+
 typedef struct {
     SDL_Window *win;
     SDL_Renderer *ren;

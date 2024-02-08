@@ -1,5 +1,6 @@
 #include "draw.h"
 #include "init_sdl.h"
+#include "logic.h"
 
 SDL_Point birdPoint;
 float gravity = 0.2f;
@@ -8,20 +9,10 @@ float jumpForce = -2.0f;
 float birdAngle = 0.0f;
 
 int currentFrame = 0;
-const int pipeGap = 120;
-int pipeTopY, pipeBottomY;
-static int pipeX = WIDTH - PIPE_WIDTH;
 int score = 0, count = 0;
+
+Pipe *head = NULL;
 enum GameState gameState = PLAYING;
-
-void resetValue() {
-    birdPoint.y = 0;
-    score = 0;
-    pipeX = WIDTH;
-    birdVelocity = jumpForce;
-}
-
-void checkCollision() {}
 
 void update() {
     if (gameState != PAUSED) {
@@ -40,13 +31,17 @@ void update() {
         }
 
         // Pipe Update
-        pipeX -= PIPE_SPEED;
-        if (pipeX <= -PIPE_WIDTH) {
-            pipeX = WIDTH;
+        Pipe *current = head;
+        while (current != NULL) {
+            current->x -= PIPE_SPEED;
+            if (current->x <= -PIPE_WIDTH) {
+                current->x = WIDTH + PIPE_WIDTH;
+                int newPositionPipe = rand() % 275 + 175;
+                current->topY = newPositionPipe - pipeGap - PIPE_HEIGHT;
+                current->bottomY = newPositionPipe + pipeGap;
+            }
+            current = current->next;
         }
-
-        pipeTopY = HEIGHT / 2 - pipeGap - PIPE_HEIGHT;
-        pipeBottomY = HEIGHT / 2 + pipeGap;
 
         checkCollision();
     }
@@ -58,11 +53,16 @@ void render(Resources *res) {
 
     drawBird(res, birdPoint, birdAngle);
 
-    SDL_Point pointPipeTop = {pipeX, pipeTopY};
-    drawPipe(res, pointPipeTop, -180);
+    Pipe *current = head;
+    while (current != NULL) {
+        SDL_Point pointPipeTop = {current->x, current->topY};
+        drawPipe(res, pointPipeTop, -180);
 
-    SDL_Point pointPipeBottom = {pipeX, pipeBottomY};
-    drawPipe(res, pointPipeBottom, 0);
+        SDL_Point pointPipeBottom = {current->x, current->bottomY};
+        drawPipe(res, pointPipeBottom, 0);
+
+        current = current->next;
+    }
 
     gameState == PAUSED ? drawPause(res) : 0;
     gameState == DEFEAT ? drawGameover(res) : 0;
@@ -74,6 +74,7 @@ int main(void) {
     const Uint32 frameDelay = 1000 / FPS;
 
     init(&res);
+    createPipe(&head);
 
     int quit = 0;
     while (!quit) {
@@ -88,8 +89,12 @@ int main(void) {
                 break;
             case ' ':
                 if (gameState == DEFEAT) {
-                    resetValue();
+                    birdPoint.y = 0;
+                    score = 0;
+                    birdVelocity = jumpForce;
+                    destroyPipes(&head);
                     gameState = PLAYING;
+                    createPipe(&head);
                 }
                 if (gameState == PLAYING) {
                     birdVelocity = jumpForce;
@@ -127,6 +132,7 @@ int main(void) {
         Uint32 frameTime = SDL_GetTicks() - frameStart;
         (frameTime < frameDelay) ? SDL_Delay(frameDelay - frameTime) : 0;
     }
+    destroyPipes(&head);
     destroyResources(&res);
     SDL_Quit();
     return 0;
