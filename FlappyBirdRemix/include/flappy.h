@@ -9,10 +9,10 @@
 #include <time.h>
 
 // Macros
-#define WIDTH 1080
-#define HEIGHT 640
 #define FPS 60
 
+#define WIDTH 1080
+#define HEIGHT 640
 #define BIRD_WIDTH 34
 #define BIRD_HEIGHT 24
 #define NUM_FRAMES 3
@@ -26,6 +26,7 @@ typedef struct Pipe {
     int x;
     int topY;
     int bottomY;
+    int passed;
     struct Pipe *next;
 } Pipe;
 
@@ -45,4 +46,4 @@ enum GameState {
     DEFEAT,
 };
 
-#endif// !FLAPPY_H
+#endif // !FLAPPY_H

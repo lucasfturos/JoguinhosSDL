@@ -1,6 +1,9 @@
-#include "objects.h"
+#ifndef OBJECTS_H
+#define OBJECTS_H
 
-TargetNode *initializeTargets() {
+#include "quebra_bloco.h"
+
+static TargetNode *initializeTargets() {
     TargetNode *head = NULL;
     for (int row = 0; row < TARGET_ROWS; row++) {
         for (int col = 0; col < TARGET_COLS; col++) {
@@ -17,7 +20,7 @@ TargetNode *initializeTargets() {
     return head;
 }
 
-void destroyTargets(TargetNode *head) {
+static void destroyTargets(TargetNode *head) {
     while (head != NULL) {
         TargetNode *temp = head;
         head = head->next;
@@ -25,24 +28,26 @@ void destroyTargets(TargetNode *head) {
     }
 }
 
-void drawGameOver(SDL_Renderer *renderer, TTF_Font *font) {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+static SDL_Rect createRect(int x, int y, int w, int h) {
+    return (SDL_Rect){.x = x, .y = y, .w = w, .h = h};
+}
 
-    font = TTF_OpenFont("./font/times.ttf", 70);
+static void drawGameOver(SDL_Renderer *ren, TTF_Font *font) {
+    SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+    SDL_RenderClear(ren);
+
+    font = TTF_OpenFont("./res/font/times.ttf", 70);
     SDL_Color color_red = {255, 0, 0, 255};
     SDL_Color color_white = {255, 255, 255, 255};
-    SDL_Surface *textSurface =
-        TTF_RenderText_Solid(font, "Perdeu", color_red);
-    SDL_Texture *textTexture =
-        SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_Surface *textSurface = TTF_RenderText_Solid(font, "Perdeu", color_red);
+    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(ren, textSurface);
     SDL_Rect textRect = {.x = (WIDTH - textSurface->w) / 2,
                          .y = (HEIGHT - textSurface->h) / 2,
                          .w = textSurface->w,
                          .h = textSurface->h};
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+    SDL_RenderCopy(ren, textTexture, NULL, &textRect);
 
-    font = TTF_OpenFont("./font/times.ttf", 30);
+    font = TTF_OpenFont("./res/font/times.ttf", 30);
     SDL_Surface *continueSurface = TTF_RenderText_Solid(
         font, "Clique Espaco para reiniciar!", color_white);
     SDL_Rect continueRect = {.x = (WIDTH - continueSurface->w) / 2,
@@ -50,9 +55,9 @@ void drawGameOver(SDL_Renderer *renderer, TTF_Font *font) {
                              .w = continueSurface->w,
                              .h = continueSurface->h};
     SDL_Texture *continueTexture =
-        SDL_CreateTextureFromSurface(renderer, continueSurface);
-    SDL_RenderCopy(renderer, continueTexture, NULL, &continueRect);
-    SDL_RenderPresent(renderer);
+        SDL_CreateTextureFromSurface(ren, continueSurface);
+    SDL_RenderCopy(ren, continueTexture, NULL, &continueRect);
+    SDL_RenderPresent(ren);
 
     TTF_CloseFont(font);
     SDL_FreeSurface(textSurface);
@@ -61,27 +66,22 @@ void drawGameOver(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_DestroyTexture(continueTexture);
 }
 
-void drawCircle(SDL_Renderer *renderer, float x, float y, int radius,
-                SDL_Color color) {
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+static void drawCircle(SDL_Renderer *ren, float x, float y, int radius,
+                       SDL_Color color) {
+    SDL_SetRenderDrawColor(ren, color.r, color.g, color.b, color.a);
     for (int w = 0; w < radius * 2; w++) {
         for (int h = 0; h < radius * 2; h++) {
             float dx = radius - w;
             float dy = radius - h;
             if ((dx * dx + dy * dy) <= (radius * radius)) {
-                SDL_RenderDrawPoint(renderer, x + dx, y + dy);
+                SDL_RenderDrawPoint(ren, x + dx, y + dy);
             }
         }
     }
 }
 
-SDL_Rect createRect(int x, int y, int w, int h) {
-    SDL_Rect rect = {.x = x, .y = y, .w = w, .h = h};
-    return rect;
-}
-
-void drawScore(SDL_Renderer *ren, TTF_Font *font, int score,
-               SDL_Texture *bgScore) {
+static void drawScore(SDL_Renderer *ren, TTF_Font *font, int score,
+                      SDL_Texture *bgScore) {
     SDL_Color textColor = {255, 255, 255, 255};
     char scoreText[50];
     snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
@@ -99,3 +99,5 @@ void drawScore(SDL_Renderer *ren, TTF_Font *font, int score,
     SDL_FreeSurface(textSurface);
     SDL_DestroyTexture(textTexture);
 }
+
+#endif // !OBJECTS_H

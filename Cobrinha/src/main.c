@@ -1,5 +1,22 @@
-#include "init_sdl.h"
-#include "obj.h"
+#include "include/init_sdl.h"
+#include "include/obj.h"
+
+// Variables global
+int tailSize;
+int elapsedTime;
+int score, level;
+int minutes, seconds;
+int boardx = (WIDTH - BOARD_W) / 2;
+int boardy = (HEIGHT - BOARD_H) / 2;
+
+// Struct global
+Resources resMgr;
+Point snake, apple;
+Point tail[MAX_SIZE_TAIL];
+
+// Enum global
+enum SnakeDir currentDir = LEFT;
+enum GameState gameState = PLAYING;
 
 void setup() {
     srand(time(0));

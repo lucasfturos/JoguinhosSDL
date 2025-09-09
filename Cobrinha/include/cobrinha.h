@@ -44,27 +44,4 @@ enum GameState {
     DEFEAT,
 };
 
-// Variables global
-static int tailSize;
-static int elapsedTime;
-static int score, level;
-static int minutes, seconds;
-static int boardx = (WIDTH - BOARD_W) / 2;
-static int boardy = (HEIGHT - BOARD_H) / 2;
-
-// Struct global
-static Resources resMgr;
-static Point snake, apple;
-static Point tail[MAX_SIZE_TAIL];
-
-// Enum global
-static enum SnakeDir currentDir = LEFT;
-static enum GameState gameState = PLAYING;
-
-// Functions
-void setup();
-void update();
-void render(SDL_Renderer *ren);
-void addTailSegment(int x, int y);
-
 #endif // !COBRINHA_H

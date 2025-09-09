@@ -1,4 +1,4 @@
-#include "objects.h"
+#include "include/objects.h"
 
 ResMgr resMgr;
 
@@ -164,11 +164,11 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-    resMgr.barTexture = IMG_LoadTexture(resMgr.ren, "img/Bar.png");
-    resMgr.brickTexture = IMG_LoadTexture(resMgr.ren, "img/Black_Brick.png");
-    resMgr.bgScore = IMG_LoadTexture(resMgr.ren, "img/score_board.png");
-    resMgr.bgTexture = IMG_LoadTexture(resMgr.ren, "img/background_sky.png");
-    resMgr.font = TTF_OpenFont("font/times.ttf", 30);
+    resMgr.barTexture = IMG_LoadTexture(resMgr.ren, "res/img/Bar.png");
+    resMgr.brickTexture = IMG_LoadTexture(resMgr.ren, "res/img/Black_Brick.png");
+    resMgr.bgScore = IMG_LoadTexture(resMgr.ren, "res/img/score_board.png");
+    resMgr.bgTexture = IMG_LoadTexture(resMgr.ren, "res/img/background_sky.png");
+    resMgr.font = TTF_OpenFont("res/font/times.ttf", 30);
     if (!resMgr.barTexture || !resMgr.brickTexture || !resMgr.bgScore ||
         !resMgr.bgTexture || !resMgr.font) {
         fprintf(stderr, "Erro ao carregar recursos: %s\n", SDL_GetError());

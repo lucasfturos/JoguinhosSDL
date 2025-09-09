@@ -1,14 +1,29 @@
-#include "init_sdl.h"
+#ifndef INIT_SDL_H
+#define INIT_SDL_H
 
-int init(Resources *res) {
+#include "flappy.h"
+
+extern int windowWidth;
+extern int windowHeight;
+
+static void destroyResources(Resources *res) {
+    TTF_CloseFont(res->font);
+    SDL_DestroyTexture(res->bgTex);
+    SDL_DestroyTexture(res->pipeTex);
+    SDL_DestroyTexture(res->birdTex);
+    SDL_DestroyRenderer(res->ren);
+    SDL_DestroyWindow(res->win);
+}
+
+static int init(Resources *res) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
 
     res->win = SDL_CreateWindow("Flappy Bird Remix", SDL_WINDOWPOS_CENTERED,
-                                SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT,
-                                SDL_WINDOW_VULKAN);
+                                SDL_WINDOWPOS_CENTERED, windowWidth,
+                                windowHeight, SDL_WINDOW_RESIZABLE);
     if (res->win == NULL) {
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
         destroyResources(res);
@@ -52,11 +67,4 @@ int init(Resources *res) {
     return EXIT_SUCCESS;
 }
 
-void destroyResources(Resources *res) {
-    TTF_CloseFont(res->font);
-    SDL_DestroyTexture(res->bgTex);
-    SDL_DestroyTexture(res->pipeTex);
-    SDL_DestroyTexture(res->birdTex);
-    SDL_DestroyRenderer(res->ren);
-    SDL_DestroyWindow(res->win);
-}
+#endif // !INIT_SDL_H

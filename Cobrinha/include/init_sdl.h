@@ -1,14 +1,24 @@
-#include "init_sdl.h"
+#ifndef INIT_SDL_H
+#define INIT_SDL_H
 
-int init(SDL_Window **win, SDL_Renderer **ren, TTF_Font **font) {
+#include "cobrinha.h"
+
+static void destroyResources(SDL_Window *win, SDL_Renderer *ren,
+                             TTF_Font *font) {
+    TTF_CloseFont(font);
+    SDL_DestroyRenderer(ren);
+    SDL_DestroyWindow(win);
+}
+
+static int init(SDL_Window **win, SDL_Renderer **ren, TTF_Font **font) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
 
     *win = SDL_CreateWindow("Cobrinha", SDL_WINDOWPOS_CENTERED,
-                           SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT,
-                           SDL_WINDOW_VULKAN);
+                            SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT,
+                            SDL_WINDOW_VULKAN);
     if (*win == NULL) {
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
         destroyResources(*win, NULL, NULL);
@@ -16,8 +26,8 @@ int init(SDL_Window **win, SDL_Renderer **ren, TTF_Font **font) {
         return EXIT_FAILURE;
     }
 
-    *ren = SDL_CreateRenderer(*win, -1,
-                             SDL_RENDERER_SOFTWARE | SDL_RENDERER_PRESENTVSYNC);
+    *ren = SDL_CreateRenderer(
+        *win, -1, SDL_RENDERER_SOFTWARE | SDL_RENDERER_PRESENTVSYNC);
     if (*ren == NULL) {
         fprintf(stderr, "SDL_CreateRenderer Error: %s\n", SDL_GetError());
         destroyResources(*win, *ren, NULL);
@@ -35,8 +45,4 @@ int init(SDL_Window **win, SDL_Renderer **ren, TTF_Font **font) {
     return EXIT_SUCCESS;
 }
 
-void destroyResources(SDL_Window *win, SDL_Renderer *ren, TTF_Font *font) {
-    TTF_CloseFont(font);
-    SDL_DestroyRenderer(ren);
-    SDL_DestroyWindow(win);
-}
+#endif // !INIT_SDL_H
