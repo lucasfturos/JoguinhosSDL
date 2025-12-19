@@ -1,21 +1,12 @@
-name: Build and Deploy SDL Games (Web)
+name: Build and Deploy SDL Games (gh-pages)
 
 on:
     push:
         branches:
             - main
 
-permissions:
-    contents: read
-    pages: write
-    id-token: write
-
-concurrency:
-    group: pages
-    cancel-in-progress: true
-
 jobs:
-    build:
+    build-and-deploy:
         runs-on: ubuntu-latest
 
         steps:
@@ -27,21 +18,38 @@ jobs:
                   sudo apt update
                   sudo apt install -y cmake python3 git
 
-            - name: Install Emscripten SDK
+            # -------- Cache Emscripten --------
+            - name: Cache Emscripten SDK
+              uses: actions/cache@v3
+              with:
+                  path: emsdk
+                  key: emscripten-${{ runner.os }}-latest
+                  restore-keys: |
+                      emscripten-${{ runner.os }}-
+
+            - name: Install Emscripten
               run: |
-                  git clone https://github.com/emscripten-core/emsdk.git
+                  if [ ! -d "emsdk" ]; then
+                    git clone https://github.com/emscripten-core/emsdk.git
+                  fi
                   cd emsdk
                   ./emsdk install latest
                   ./emsdk activate latest
                   echo "$(pwd)" >> $GITHUB_PATH
                   echo "source $(pwd)/emsdk_env.sh" >> $GITHUB_ENV
 
+            - name: Test Emscripten
+              run: |
+                  source emsdk/emsdk_env.sh
+                  emcc -v
+
+            # -------- Prepare output --------
             - name: Prepare web directory
               run: |
                   rm -rf web
                   mkdir -p web/cobrinha web/flappy web/quebra_bloco
 
-            # ---------------- Cobrinha ----------------
+            # -------- Build Cobrinha --------
             - name: Build Cobrinha (Web)
               run: |
                   source emsdk/emsdk_env.sh
@@ -52,7 +60,7 @@ jobs:
                   cmake --build build-web
                   cp build-web/* ../web/cobrinha/
 
-            # ---------------- Flappy Bird ----------------
+            # -------- Build Flappy --------
             - name: Build FlappyBirdRemix (Web)
               run: |
                   source emsdk/emsdk_env.sh
@@ -63,7 +71,7 @@ jobs:
                   cmake --build build-web
                   cp build-web/* ../web/flappy/
 
-            # ---------------- Quebra Bloco ----------------
+            # -------- Build Quebra Bloco --------
             - name: Build Quebra Bloco (Web)
               run: |
                   source emsdk/emsdk_env.sh
@@ -74,20 +82,11 @@ jobs:
                   cmake --build build-web
                   cp build-web/* ../web/quebra_bloco/
 
-            # ---------------- Upload ----------------
-            - name: Upload Pages artifact
-              uses: actions/upload-pages-artifact@v3
+            # -------- Deploy to gh-pages --------
+            - name: Deploy to gh-pages
+              uses: peaceiris/actions-gh-pages@v3
               with:
-                  path: web
-
-    deploy:
-        runs-on: ubuntu-latest
-        needs: build
-        environment:
-            name: github-pages
-            url: ${{ steps.deployment.outputs.page_url }}
-
-        steps:
-            - name: Deploy to GitHub Pages
-              id: deployment
-              uses: actions/deploy-pages@v4
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_branch: gh-pages
+                  publish_dir: ./web
+                  force_orphan: true
