@@ -19,14 +19,15 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
             - name: Install system dependencies
               run: |
                   sudo apt update
                   sudo apt install -y cmake python3 git
 
-            - name: Install Emscripten
+            - name: Install Emscripten SDK
               run: |
                   git clone https://github.com/emscripten-core/emsdk.git
                   cd emsdk
@@ -35,36 +36,45 @@ jobs:
                   echo "$(pwd)" >> $GITHUB_PATH
                   echo "source $(pwd)/emsdk_env.sh" >> $GITHUB_ENV
 
-            - name: Build Cobrinha
+            - name: Prepare web directory
+              run: |
+                  rm -rf web
+                  mkdir -p web/cobrinha web/flappy web/quebra_bloco
+
+            # ---------------- Cobrinha ----------------
+            - name: Build Cobrinha (Web)
               run: |
                   source emsdk/emsdk_env.sh
                   cd Cobrinha
+                  rm -rf build-web
                   mkdir build-web
                   emcmake cmake -S . -B build-web
                   cmake --build build-web
-                  mkdir -p ../web/cobrinha
                   cp build-web/* ../web/cobrinha/
 
-            - name: Build FlappyBirdRemix
+            # ---------------- Flappy Bird ----------------
+            - name: Build FlappyBirdRemix (Web)
               run: |
                   source emsdk/emsdk_env.sh
                   cd FlappyBirdRemix
+                  rm -rf build-web
                   mkdir build-web
                   emcmake cmake -S . -B build-web
                   cmake --build build-web
-                  mkdir -p ../web/flappy
                   cp build-web/* ../web/flappy/
 
-            - name: Build QuebraBloco
+            # ---------------- Quebra Bloco ----------------
+            - name: Build Quebra Bloco (Web)
               run: |
                   source emsdk/emsdk_env.sh
                   cd Quebra_Bloco
+                  rm -rf build-web
                   mkdir build-web
                   emcmake cmake -S . -B build-web
                   cmake --build build-web
-                  mkdir -p ../web/quebra_bloco
                   cp build-web/* ../web/quebra_bloco/
 
+            # ---------------- Upload ----------------
             - name: Upload Pages artifact
               uses: actions/upload-pages-artifact@v3
               with:
