@@ -24,7 +24,6 @@ add_executable(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${SDL2_INCLUDE_DIRS}
 )
 
 if(EMSCRIPTEN)
@@ -51,6 +50,10 @@ if(EMSCRIPTEN)
 else()
     find_package(SDL2 REQUIRED)
     find_package(SDL2_ttf REQUIRED)
+
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        ${SDL2_INCLUDE_DIRS}
+    )
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
         SDL2::SDL2
