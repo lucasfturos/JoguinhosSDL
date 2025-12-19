@@ -18,7 +18,7 @@ static int init(SDL_Window **win, SDL_Renderer **ren, TTF_Font **font) {
 
     *win = SDL_CreateWindow("Cobrinha", SDL_WINDOWPOS_CENTERED,
                             SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT,
-                            SDL_WINDOW_VULKAN);
+                            SDL_WINDOW_RESIZABLE);
     if (*win == NULL) {
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
         destroyResources(*win, NULL, NULL);

@@ -1,0 +1,83 @@
+name: Build and Deploy SDL Games (Web)
+
+on:
+    push:
+        branches:
+            - main
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+concurrency:
+    group: pages
+    cancel-in-progress: true
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install system dependencies
+              run: |
+                  sudo apt update
+                  sudo apt install -y cmake python3 git
+
+            - name: Install Emscripten
+              run: |
+                  git clone https://github.com/emscripten-core/emsdk.git
+                  cd emsdk
+                  ./emsdk install latest
+                  ./emsdk activate latest
+                  echo "$(pwd)" >> $GITHUB_PATH
+                  echo "source $(pwd)/emsdk_env.sh" >> $GITHUB_ENV
+
+            - name: Build Cobrinha
+              run: |
+                  source emsdk/emsdk_env.sh
+                  cd Cobrinha
+                  mkdir build-web
+                  emcmake cmake -S . -B build-web
+                  cmake --build build-web
+                  mkdir -p ../web/cobrinha
+                  cp build-web/* ../web/cobrinha/
+
+            - name: Build FlappyBirdRemix
+              run: |
+                  source emsdk/emsdk_env.sh
+                  cd FlappyBirdRemix
+                  mkdir build-web
+                  emcmake cmake -S . -B build-web
+                  cmake --build build-web
+                  mkdir -p ../web/flappy
+                  cp build-web/* ../web/flappy/
+
+            - name: Build QuebraBloco
+              run: |
+                  source emsdk/emsdk_env.sh
+                  cd Quebra_Bloco
+                  mkdir build-web
+                  emcmake cmake -S . -B build-web
+                  cmake --build build-web
+                  mkdir -p ../web/quebra_bloco
+                  cp build-web/* ../web/quebra_bloco/
+
+            - name: Upload Pages artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: web
+
+    deploy:
+        runs-on: ubuntu-latest
+        needs: build
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4

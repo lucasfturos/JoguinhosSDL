@@ -3,6 +3,11 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

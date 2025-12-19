@@ -19,6 +19,10 @@ int score = 0;
 Pipe *head = NULL;
 enum GameState gameState = PLAYING;
 
+int quit = 0;
+int isPaused = 0;
+const Uint32 frameDelay = 1000 / FPS;
+
 void update() {
     if (gameState != PLAYING) {
         birdPoint.y += birdVelocity;
@@ -80,83 +84,92 @@ void render(Resources *res) {
         drawGameover(res);
 }
 
+void gameLoop(void *arg) {
+    Resources *res = (Resources *)arg;
+    Uint32 frameStart = SDL_GetTicks();
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+        case SDL_QUIT:
+            quit = 1;
+            break;
+
+        case SDL_WINDOWEVENT:
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                windowWidth = event.window.data1;
+                windowHeight = event.window.data2;
+                scaleX = (float)windowWidth / WIDTH;
+                scaleY = (float)windowHeight / HEIGHT;
+            }
+            break;
+
+        case SDL_KEYDOWN:
+            switch (event.key.keysym.sym) {
+            case SDLK_ESCAPE:
+                quit = 1;
+                break;
+            case SDLK_p:
+                isPaused = !isPaused;
+                gameState = isPaused ? PAUSED : PLAYING;
+                break;
+            case SDLK_SPACE:
+                if (gameState == DEFEAT) {
+                    birdPoint.y = 0;
+                    score = 0;
+                    birdVelocity = jumpForce;
+                    destroyPipes(&head);
+                    gameState = PLAYING;
+                    initPipes(&head, &score);
+                } else if (gameState == PLAYING) {
+                    birdVelocity = jumpForce;
+                }
+                break;
+            }
+            break;
+        }
+    }
+
+    const Uint8 *keyboard = SDL_GetKeyboardState(NULL);
+    if (keyboard[SDL_SCANCODE_SPACE]) {
+        if (jumpForce > -5.0f)
+            jumpForce -= 0.1f;
+        else
+            jumpForce = -2.0f;
+    } else if (jumpForce < -2.0f) {
+        jumpForce = -2.0f;
+    }
+
+    SDL_SetRenderDrawColor(res->ren, 0, 0, 0, 255);
+    SDL_RenderClear(res->ren);
+
+    update();
+    render(res);
+
+    SDL_RenderPresent(res->ren);
+
+#ifndef __EMSCRIPTEN__
+    Uint32 frameTime = SDL_GetTicks() - frameStart;
+    if (frameTime < frameDelay)
+        SDL_Delay(frameDelay - frameTime);
+#endif
+}
+
 int main(void) {
-    Resources res;
-    int isPaused = 0;
-    const Uint32 frameDelay = 1000 / FPS;
+    static Resources res;
 
     if (init(&res) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
     initPipes(&head, &score);
 
-    int quit = 0;
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop_arg(gameLoop, NULL, 0, 1);
+#else
     while (!quit) {
-        Uint32 frameStart = SDL_GetTicks();
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                quit = 1;
-                break;
-
-            case SDL_WINDOWEVENT:
-                if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-                    windowWidth = event.window.data1;
-                    windowHeight = event.window.data2;
-                    scaleX = (float)windowWidth / WIDTH;
-                    scaleY = (float)windowHeight / HEIGHT;
-                }
-                break;
-
-            case SDL_KEYDOWN:
-                switch (event.key.keysym.sym) {
-                case SDLK_ESCAPE:
-                    quit = 1;
-                    break;
-                case SDLK_p:
-                    isPaused = !isPaused;
-                    gameState = isPaused ? PAUSED : PLAYING;
-                    break;
-                case SDLK_SPACE:
-                    if (gameState == DEFEAT) {
-                        birdPoint.y = 0;
-                        score = 0;
-                        birdVelocity = jumpForce;
-                        destroyPipes(&head);
-                        gameState = PLAYING;
-                        initPipes(&head, &score);
-                    } else if (gameState == PLAYING) {
-                        birdVelocity = jumpForce;
-                    }
-                    break;
-                }
-                break;
-            }
-        }
-
-        const Uint8 *keyboard = SDL_GetKeyboardState(NULL);
-        if (keyboard[SDL_SCANCODE_SPACE]) {
-            if (jumpForce > -5.0f)
-                jumpForce -= 0.1f;
-            else
-                jumpForce = -2.0f;
-        } else if (jumpForce < -2.0f) {
-            jumpForce = -2.0f;
-        }
-
-        SDL_SetRenderDrawColor(res.ren, 0, 0, 0, 255);
-        SDL_RenderClear(res.ren);
-
-        update();
-        render(&res);
-
-        SDL_RenderPresent(res.ren);
-
-        Uint32 frameTime = SDL_GetTicks() - frameStart;
-        if (frameTime < frameDelay)
-            SDL_Delay(frameDelay - frameTime);
+        gameLoop(&res);
     }
+#endif
 
     destroyPipes(&head);
     destroyResources(&res);

@@ -4,6 +4,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,6 +55,6 @@ typedef struct {
     SDL_Texture *bgScore;
     SDL_Texture *bgTexture;
     TTF_Font *font;
-} ResMgr;
+} Resources;
 
 #endif // !QUEBRA_BLOCO_H
