@@ -16,7 +16,7 @@ jobs:
             - name: Install system dependencies
               run: |
                   sudo apt update
-                  sudo apt install -y cmake python3 git
+                  sudo apt install -y cmake gcc make python3
 
             # -------- Cache Emscripten --------
             - name: Cache Emscripten SDK
@@ -29,19 +29,14 @@ jobs:
 
             - name: Install Emscripten
               run: |
-                  if [ ! -d "emsdk" ]; then
-                    git clone https://github.com/emscripten-core/emsdk.git
-                  fi
-                  cd emsdk
+                  cd external/emsdk
                   ./emsdk install latest
                   ./emsdk activate latest
-                  echo "$(pwd)" >> $GITHUB_PATH
-                  echo "source $(pwd)/emsdk_env.sh" >> $GITHUB_ENV
+                  echo "EMSCRIPTEN_PATH=$(pwd)/upstream/emscripten" >> $GITHUB_ENV
+                  echo "$(pwd)/upstream/emscripten" >> $GITHUB_PATH
 
             - name: Test Emscripten
-              run: |
-                  source emsdk/emsdk_env.sh
-                  emcc -v
+              run: emcc -v
 
             # -------- Prepare output --------
             - name: Prepare web directory
