@@ -37,7 +37,9 @@ jobs:
                   ./emsdk activate latest
 
             - name: Test Emscripten
-              run: emcc -v
+              run: |
+                  source emsdk/emsdk_env.sh
+                  emcc -v
 
             # -------- Prepare output --------
             - name: Prepare web directory
